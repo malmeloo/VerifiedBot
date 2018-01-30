@@ -36,7 +36,7 @@ async def data_update():
 		print("Starting role calculation...")
 		print("-" * 30)
 		for member in data.keys():
-			if int(data[member]["msgs"] / calc_days_to_now(data[member]["talkingsince"]) >= msgminimum:
+			if int(data[member]["msgs"] / calc_days_to_now(data[member]["talkingsince"])) >= msgminimum:
 				if "Verified" in client.get_user_info(member).roles:
 					pass
 				else:
