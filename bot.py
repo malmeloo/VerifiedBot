@@ -73,7 +73,7 @@ async def role_update():
 		
 @client.event()
 async def on_ready():
-	print("Ready as {0}! (ID: {1})".format(client.user.name, client.user.id))
+	print("Ready as {0.name}! (ID: {0.id})".format(client.user))
 
 @client.event()
 async def on_message(message):
