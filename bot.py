@@ -11,7 +11,7 @@ data = pickle.load(file)
 
 """BEGIN OF SETTINGS"""
 msgminimum = 100					#average minimum of messages a user has to send in  a day. Default is 100.
-updaterate = 60						#the rate data should get updated in minutes. Default is every hour (60).
+updaterate = 5						#the rate data should get updated in minutes. Default is every hour (60).
 prunerate = 24						#the rate members should get their roles pruned in hours. Default is every day (24).
 """END OF SETTINGS"""
 
@@ -61,12 +61,12 @@ async def role_update():
 		print()
 		print("-" * 30)
 		print("Starting role updating...")
+		
 		for prunemember in deletequery:
-			"""<REMOVE ROLE>"""
-			pass #for now
+			await client.remove_roles(client.get_member(prunemember), discord.utils.get(client.get_all_servers()[0].roles, name="Verified"))
 		for addmember in assignquery:
-			"""<ASSIGN ROLE>"""
-			pass #for now
+			await client.add_roles(client.get_member(addmember), discord.utils.get(client.get_all_servers()[0].roles, name="Verified"))
+		
 		print("Done! Updated a total of {} members.".format(str(len(assignquery)+len(deletequery))))
 		await asyncio.sleep(prunerate * 3600)
 		
@@ -77,7 +77,7 @@ async def on_ready():
 
 @client.event()
 async def on_message(message):
-	if message.channel.id == '' or message.channel.name == 'random':
+	if message.channel.id == '326148489828368385' or message.channel.name == 'random':
 		return
 	if not message.user.id in data.keys():
 		data[message.user.id] = {"talkingsince":get_current_date(), "msgs":1}
