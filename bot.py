@@ -63,9 +63,9 @@ async def role_update():
 		print("Starting role updating...")
 		
 		for prunemember in deletequery:
-			await client.remove_roles(client.get_member(prunemember), discord.utils.get(client.get_all_servers()[0].roles, name="Verified"))
+			await client.remove_roles(client.get_member(prunemember), discord.utils.get(client.get_server('206934458954153984').roles, name="Verified"))
 		for addmember in assignquery:
-			await client.add_roles(client.get_member(addmember), discord.utils.get(client.get_all_servers()[0].roles, name="Verified"))
+			await client.add_roles(client.get_member(addmember), discord.utils.get(client.get_server('206934458954153984').roles, name="Verified"))
 		
 		print("Done! Updated a total of {} members.".format(str(len(assignquery)+len(deletequery))))
 		await asyncio.sleep(prunerate * 3600)
