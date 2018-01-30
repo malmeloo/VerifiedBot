@@ -71,11 +71,11 @@ async def role_update():
 		await asyncio.sleep(prunerate * 3600)
 		
 		
-@client.event()
+@client.event
 async def on_ready():
 	print("Ready as {0.name}! (ID: {0.id})".format(client.user))
 
-@client.event()
+@client.event
 async def on_message(message):
 	if message.channel.id == '326148489828368385' or message.channel.name == 'random':
 		return
