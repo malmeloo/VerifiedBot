@@ -79,8 +79,8 @@ async def on_ready():
 async def on_message(message):
 	if message.channel.id == '326148489828368385' or message.channel.name == 'random':
 		return
-	if not message.user.id in data.keys():
-		data[message.user.id] = {"talkingsince":get_current_date(), "msgs":1}
+	if not message.author.id in data.keys():
+		data[message.author.id] = {"talkingsince":get_current_date(), "msgs":1}
 	else:
 		data[message.user.id]["msgs"] += 1
 
