@@ -11,7 +11,7 @@ data = pickle.load(file)
 
 """BEGIN OF SETTINGS"""
 msgminimum = 100					#average minimum of messages a user has to send in  a day. Default is 100.
-updaterate = 5						#the rate data should get updated in minutes. Default is every hour (60).
+updaterate = 60						#the rate data should get updated in minutes. Default is every hour (60).
 prunerate = 24						#the rate members should get their roles pruned in hours. Default is every day (24).
 """END OF SETTINGS"""
 
@@ -37,12 +37,12 @@ async def data_update():
 		print("-" * 30)
 		for member in data.keys():
 			if int(data[member]["msgs"] / calc_days_to_now(data[member]["talkingsince"])) >= msgminimum:
-				if "Verified" in client.get_user_info(member).roles:
+				if "Active" in [str(x) for x in client.get_user_info(member).roles]:
 					pass
 				else:
 					assignquery.append(member)
 			else:
-				if "Verified" in client.get_user_info(member).roles:
+				if "Active" in client.get_user_info(member).roles:
 					deletequery.append(member)
 				else:
 					pass
@@ -63,9 +63,9 @@ async def role_update():
 		print("Starting role updating...")
 		
 		for prunemember in deletequery:
-			await client.remove_roles(client.get_member(prunemember), discord.utils.get(client.get_server('206934458954153984').roles, name="Verified"))
+			await client.remove_roles(client.get_member(prunemember), discord.utils.get(client.get_server('206934458954153984').roles, name="Active"))
 		for addmember in assignquery:
-			await client.add_roles(client.get_member(addmember), discord.utils.get(client.get_server('206934458954153984').roles, name="Verified"))
+			await client.add_roles(client.get_member(addmember), discord.utils.get(client.get_server('206934458954153984').roles, name="Active"))
 		
 		print("Done! Updated a total of {} members.".format(str(len(assignquery)+len(deletequery))))
 		await asyncio.sleep(prunerate * 3600)
