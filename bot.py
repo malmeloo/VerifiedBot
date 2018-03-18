@@ -82,7 +82,7 @@ async def on_message(message):
 	if not message.author.id in data.keys():
 		data[message.author.id] = {"talkingsince":get_current_date(), "msgs":1}
 	else:
-		data[message.user.id]["msgs"] += 1
+		data[message.author.id]["msgs"] += 1
 
 client.loop.create_task(data_update())
 client.loop.create_task(role_update())
