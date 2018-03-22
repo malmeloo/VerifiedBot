@@ -10,7 +10,7 @@ import textwrap
 import asyncio
 from datetime import datetime
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 client = Bot(command_prefix='v!')
 client.remove_command('help')
