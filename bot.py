@@ -16,7 +16,6 @@ logging.basicConfig(level=logging.INFO)
 client = Bot(command_prefix='v!')
 client.remove_command('help')
 
-_last_result = None
 cache = []
 ignored = []
 
@@ -47,8 +46,7 @@ async def _eval(ctx, *, body: str):
 		'channel': ctx.channel,
 		'author': ctx.author,
 		'guild': ctx.guild,
-		'message': ctx.message,
-		'_': _last_result
+		'message': ctx.message
 	}
 
 	env.update(globals())
@@ -79,7 +77,6 @@ async def _eval(ctx, *, body: str):
 			if value:
 				await ctx.send(f'```py\n{value}\n```')
 		else:
-			_last_result = ret
 			await ctx.send(f'```py\n{value}{ret}\n```')
 
 #REGULAR COMMANDS
