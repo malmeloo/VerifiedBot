@@ -11,7 +11,7 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 
 client = Bot(command_prefix='v!')
-client.remove_comand('help')
+client.remove_command('help')
 
 _last_result = None
 cache = []
