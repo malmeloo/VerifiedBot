@@ -162,12 +162,12 @@ async def on_ready():
 	rc24 = client.get_guild(206934458954153984)
 	verified_role = discord.utils.get(rc24.roles, name="Active")
 
-    print(discord.__version__)
-    print('------------------')
-    print('Logged in as:')
-    print(client.user.name)
-    print(client.user.id)
-    print('------------------')
+	print(discord.__version__)
+	print('------------------')
+	print('Logged in as:')
+	print(client.user.name)
+	print(client.user.id)
+	print('------------------')
 
 #TASKS
 async def update():
