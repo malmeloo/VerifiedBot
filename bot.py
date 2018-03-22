@@ -154,7 +154,9 @@ async def on_message(message):
 	if message.channel.id == 326148489828368385: #ignore #random
 		return
 
+	print("Reached process")
 	await client.process_commands(message)
+	print("Ended process")
 
 @client.event
 async def on_ready():
