@@ -18,7 +18,7 @@ cache = []
 ignored = []
 
 rc24 = client.get_guild(206934458954153984)
-verified_role = discord.utils.get(server.roles, name="Active")
+verified_role = discord.utils.get(rc24.roles, name="Active")
 updated = datetime.now().strftime('%x %X GMT+0')
 
 #SETTINGS
@@ -155,6 +155,15 @@ async def on_message(message):
 		return
 
 	cache.append(message)
+
+@client.event
+async def on_ready():
+    print(discord.__version__)
+    print('------------------')
+    print('Logged in as:')
+    print(client.user.name)
+    print(client.user.id)
+    print('------------------')
 
 #TASKS
 async def update():
