@@ -10,7 +10,7 @@ import textwrap
 import asyncio
 from datetime import datetime
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 client = Bot(command_prefix='v!')
 client.remove_command('help')
@@ -153,8 +153,6 @@ async def on_message(message):
 		return
 	if message.channel.id == 326148489828368385: #ignore #random
 		return
-
-	cache.append(message)
 
 	await client.process_commands(message)
 
