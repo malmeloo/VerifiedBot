@@ -2,6 +2,7 @@ import discord
 from discord.ext.commands import Bot
 from discord.ext import commands
 import logging
+import traceback
 import os
 from contextlib import redirect_stdout
 import io
@@ -143,7 +144,7 @@ async def on_command_error(ctx, error):
 	elif isinstance(error, commands.MissingRequiredArgument):
 		await ctx.send(f':x: {error}')
 	else:
-		print(error) #lazy af but hey
+		traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 #EVENTS
 @client.event
