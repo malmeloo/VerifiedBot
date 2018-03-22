@@ -6,6 +6,7 @@ import traceback
 import os
 from contextlib import redirect_stdout
 import io
+import sys
 import textwrap
 import asyncio
 from datetime import datetime
@@ -151,12 +152,12 @@ async def on_command_error(ctx, error):
 async def on_message(message):
 	if message.author.bot:
 		return
-	if message.channel.id == 326148489828368385: #ignore #random
+	if message.channel.id == 326148489828368385 and not message.content.startswith('v!'): #ignore #random
 		return
 
-	print("Reached process")
+	cache.append(message)
+
 	await client.process_commands(message)
-	print("Ended process")
 
 @client.event
 async def on_ready():
