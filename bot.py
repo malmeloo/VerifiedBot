@@ -156,6 +156,8 @@ async def on_message(message):
 
 	cache.append(message)
 
+	await client.process_commands(message)
+
 @client.event
 async def on_ready():
 	global rc24
