@@ -1,5 +1,6 @@
 import discord
-from discord.ext import Bot, commands
+from discord.ext.commands import Bot
+from discord.ext import commands
 from contextlib import redirect_stdout
 import io
 import textwrap
