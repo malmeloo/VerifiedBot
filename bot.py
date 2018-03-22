@@ -1,90 +1,182 @@
 import discord
-import pickle
-import datetime
-import os
+from discord.ext import Bot, commands
+from contextlib import redirect_stdout
+import io
+import textwrap
 import asyncio
+from datetime import datetime
 
-client = discord.Client()
+logging.basicConfig(level=logging.INFO)
 
-file = open("dict.pickle","rb")
-data = pickle.load(file)
+client = Bot(command_prefix='v!')
+client.remove_comand('help')
 
-"""BEGIN OF SETTINGS"""
-msgminimum = 100					#average minimum of messages a user has to send in  a day. Default is 100.
-updaterate = 60						#the rate data should get updated in minutes. Default is every hour (60).
-prunerate = 24						#the rate members should get their roles pruned in hours. Default is every day (24).
-"""END OF SETTINGS"""
+_last_result = None
+cache = []
+ignored = []
 
-deletequery = []
-assignquery = []
+rc24 = client.get_guild(206934458954153984)
+verified_role = discord.utils.get(server.roles, name="Active")
+updated = datetime.now().strftime('%x %X GMT+0')
 
-def calc_days_to_now(date):
-	delta = get_current_date() - date
-	return delta.days
-	
-def get_current_date():
-	now = datetime.datetime.now()
-	parsed = datetime.date(now.year, now.month, now.day)
-	return parsed
+#SETTINGS
+updaterate = 24			#update roles in h
+minimum = 100			#min msgs a user has to send each day
 
-async def data_update():
-	await client.wait_until_ready()
-	while not client.is_closed:
-		deletequery = []
-		assignquery = []
-		print()
-		print("Starting role calculation...")
-		print("-" * 30)
-		for member in data.keys():
-			if int(data[member]["msgs"] / calc_days_to_now(data[member]["talkingsince"])) >= msgminimum:
-				if "Active" in [str(x) for x in client.get_user_info(member).roles]:
-					pass
-				else:
-					assignquery.append(member)
-			else:
-				if "Active" in client.get_user_info(member).roles:
-					deletequery.append(member)
-				else:
-					pass
-		print("{} members for deletion of role: ".format(str(len(deletequery))) + str(deletequery))
-		print("{} members for addition of role: ".format(str(len(assignquery))) + str(assignquery))
-		
-		# update file with new dict so it will survive reboots
-		file = open("dict.pickle","wb")
-		pickle.dump(data, file)
-		file.close()
-		await asyncio.sleep(updaterate * 60)
-		
-async def role_update():
-	await client.wait_until_ready()
-	while not client.is_closed:
-		print()
-		print("-" * 30)
-		print("Starting role updating...")
-		
-		for prunemember in deletequery:
-			await client.remove_roles(client.get_member(prunemember), discord.utils.get(client.get_server('206934458954153984').roles, name="Active"))
-		for addmember in assignquery:
-			await client.add_roles(client.get_member(addmember), discord.utils.get(client.get_server('206934458954153984').roles, name="Active"))
-		
-		print("Done! Updated a total of {} members.".format(str(len(assignquery)+len(deletequery))))
-		await asyncio.sleep(prunerate * 3600)
-		
-		
+#REGULAR FUNCTIONS
+async def assign_role(user_id):
+	"""assign role here"""
+	member = rc24.get_member(user_id)
+	await member.add_roles(verified_role, reason=f'[VERIFY] Added {verified_role} role to user.')
+
+async def remove_role(user_id):
+	"""remove role here"""
+	member = rc24.get_member(user_id)
+	await member.add_roles(verified_role, reason=f'[UNVERIFY] Removed {verified_role} role from user.')
+
+#OWNER COMMAND(S)
+@client.command(hidden=True, name='eval')
+@commands.is_owner()
+async def _eval(ctx, *, body: str):
+	env = {
+        'client': client,
+        'ctx': ctx,
+        'channel': ctx.channel,
+        'author': ctx.author,
+        'guild': ctx.guild,
+        'message': ctx.message,
+        '_': _last_result
+    }
+
+    env.update(globals())
+    stdout = io.StringIO()
+
+    to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
+
+    try:
+        exec(to_compile, env)
+    except Exception as e:
+        return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
+
+    func = env['func']
+    try:
+        with redirect_stdout(stdout):
+            ret = await func()
+    except Exception as e:
+        value = stdout.getvalue()
+        await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
+    else:
+        value = stdout.getvalue()
+        try:
+            await ctx.message.add_reaction('\u2705')
+        except:
+            pass
+
+        if ret is None:
+            if value:
+                await ctx.send(f'```py\n{value}\n```')
+        else:
+            _last_result = ret
+            await ctx.send(f'```py\n{value}{ret}\n```')
+
+#REGULAR COMMANDS
+@client.command()
+@commands.has_permissions(kick_members=True)
+async def check(ctx, user : discord.Member):
+	"""Check the current addition/removal status (WIP)"""
+	messages = [x for x in cache if x.author.id == user.id]
+	eligble = len(messages) >= minimum
+
+	embed = discord.Embed(title='Status')
+	embed.add_field(name='Messages sent', value=len(messages))
+	embed.add_field(name='Eligble for verification', value=eligble)
+
+	if eligble:
+		embed.color = discord.Color.green()
+	else:
+		embed.color = discord.Color.red()
+
+	await ctx.send(f':white_check_mark: Stats of `{user}` since {updated}:', embed=embed)
+
+@client.command()
+@commands.has_permissions(kick_members=True)
+async def verify(ctx, user : discord.Member):
+	"""Temporarily verify a user"""
+	try:
+		await assign_role(user.id)
+		await ctx.send(f':white_check_mark: Temporarily verified the user `{user}`!')
+	except Exception as err:
+		await ctx.send(f':x: An error has occured while trying to verify the user `{user}`:\n```{err}```')
+
+@client.command()
+@commands.has_permissions(kick_members=True)
+async def unverify(ctx, user : discord.Member):
+	"""Temporarily unverify a user"""
+	try:
+		await remove_role(user.id)
+		await ctx.send(f':white_check_mark: Temporarily unverified `{user}`!')
+	except Exception as err:
+		await ctx.send(f':x: An error has occured while trying to remove the role from `{user}`:\n```{err}```')
+
+@client.command()
+@commands.has_permissions(kick_members=True)
+async def ignore(ctx, user : discord.Member):
+	"""Ignore a user in the daily process (excludes manual checks)"""
+	ignored.append(user.id)
+	await ctx.send(f':white_check_mark: Now ignoring the user `{user}` until the next reboot.')
+
+@client.command()
+@commands.has_permissions(kick_members=True)
+async def unignore(ctx, user : discord.Member):
+	"""Unignore a user in the daily process"""
+	ignored.remove(user.id)
+	await ctx.send(f':white_check_mark: Stopped ignoring the user `{user}`.')
+
+#ERRORS
 @client.event
-async def on_ready():
-	print("Ready as {0.name}! (ID: {0.id})".format(client.user))
+async def on_command_error(ctx, error):
+	if isinstance(error, commands.errors.BadArgument):
+		await ctx.send(':x: I couldn\'t find a user with that name!')
+	elif isinstance(error, (commands.MissingPermissions, commands.NotOwner)):
+		await ctx.send(':x: You do not have permission to use this command!')
+	elif isinstance(error, commands.MissingRequiredArgument):
+		await ctx.send(f':x: {error}')
+	else:
+		print(error) #lazy af but hey
 
+#EVENTS
 @client.event
 async def on_message(message):
-	if message.channel.id == '326148489828368385' or message.channel.name == 'random':
+	if message.author.bot:
 		return
-	if not message.author.id in data.keys():
-		data[message.author.id] = {"talkingsince":get_current_date(), "msgs":1}
-	else:
-		data[message.author.id]["msgs"] += 1
+	if message.channel.id == 326148489828368385: #ignore #random
+		return
 
-client.loop.create_task(data_update())
-client.loop.create_task(role_update())
+	cache.append(message)
 
+#TASKS
+async def update():
+	await client.wait_until_ready()
+
+	while not client.is_closed:
+
+		members = rc24.members
+
+		for member in members:
+			amount = len([msg for msg in cache if msg.author.id == member.id and not msg.author.id in ignored])
+			eligble = amount >= minimum
+
+			try:
+				if eligble and (not verified_role in member.roles):
+					await assign_role(member.id)
+				elif (not eligble) and (verified_role in member.roles):
+					await remove_role(member.id)
+			except discord.Forbidden:
+				pass
+		cache = [] #reset the cache
+		updated = datetime.now().strftime('%x %X GMT+0')
+
+		await asyncio.sleep(updaterate * 3600)
+
+client.loop.create_task(update())
 client.run(os.environ['BOT_TOKEN'])
