@@ -83,7 +83,6 @@ async def _eval(ctx, *, body: str):
 
 #REGULAR COMMANDS
 @client.command()
-@commands.has_permissions(kick_members=True)
 async def check(ctx, user : discord.Member):
 	"""Check the current addition/removal status (WIP)"""
 	messages = [x for x in cache if x.author.id == user.id]
