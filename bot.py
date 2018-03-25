@@ -88,7 +88,7 @@ async def help(ctx):
 	em = discord.Embed(color=discord.Color.green(), title='Commands list')
 	for cmd in [x for x in client.commands if x.can_run(ctx)]:
 		em.add_field(name=cmd.signature, value=cmd.description)
-	em.set_footer("Only commands you can use are shown.")
+	em.set_footer(text="Only commands you can use are shown.")
 
 	await ctx.send(embed=em)
 
