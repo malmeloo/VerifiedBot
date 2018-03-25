@@ -37,7 +37,7 @@ async def remove_role(user_id):
 	await member.add_roles(verified_role, reason=f'[UNVERIFY] Removed {verified_role} role from user.')
 
 #OWNER COMMAND(S)
-@client.command(hidden=True, name='eval')
+@client.command(description="Eval some code", name='eval')
 @commands.is_owner()
 async def _eval(ctx, *, body: str):
 	env = {
@@ -82,7 +82,7 @@ async def _eval(ctx, *, body: str):
 			await ctx.send(f'```py\n{value}{ret}\n```')
 
 #REGULAR COMMANDS
-@client.command()
+@client.command(description="What do you think this is..?")
 async def help(ctx):
 	"""Guess what this is"""
 	em = discord.Embed(color=discord.Color.green(), title='Commands list')
