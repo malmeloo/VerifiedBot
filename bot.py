@@ -83,8 +83,18 @@ async def _eval(ctx, *, body: str):
 
 #REGULAR COMMANDS
 @client.command()
+async def help(ctx):
+	"""Guess what this is"""
+	em = discord.Embed(color=discord.Color.green(), title='Commands list')
+	for cmd in [x for x in client.commands if x.can_run(ctx)]:
+		em.add_field(name=cmd.signature, value=cmd.description)
+	em.set_footer("Only commands you can use are shown.")
+
+	await ctx.send(embed=em)
+
+@client.command(description="Check the verification status of a user.")
 async def check(ctx, user : discord.Member):
-	"""Check the current addition/removal status (WIP)"""
+	"""Check the current addition/removal status"""
 	messages = [x for x in cache if x.author.id == user.id]
 	eligble = len(messages) >= minimum
 
@@ -99,7 +109,7 @@ async def check(ctx, user : discord.Member):
 
 	await ctx.send(f':white_check_mark: Stats of `{user}` since {updated}:', embed=embed)
 
-@client.command()
+@client.command(description="Manually verify someone.")
 @commands.has_permissions(kick_members=True)
 async def verify(ctx, user : discord.Member):
 	"""Temporarily verify a user"""
@@ -109,7 +119,7 @@ async def verify(ctx, user : discord.Member):
 	except Exception as err:
 		await ctx.send(f':x: An error has occured while trying to verify the user `{user}`:\n```{err}```')
 
-@client.command()
+@client.command(description="Manually unverify someone.")
 @commands.has_permissions(kick_members=True)
 async def unverify(ctx, user : discord.Member):
 	"""Temporarily unverify a user"""
@@ -119,14 +129,14 @@ async def unverify(ctx, user : discord.Member):
 	except Exception as err:
 		await ctx.send(f':x: An error has occured while trying to remove the role from `{user}`:\n```{err}```')
 
-@client.command()
+@client.command(description="Leave someone out of the daily verification process.")
 @commands.has_permissions(kick_members=True)
 async def ignore(ctx, user : discord.Member):
 	"""Ignore a user in the daily process (excludes manual checks)"""
 	ignored.append(user.id)
 	await ctx.send(f':white_check_mark: Now ignoring the user `{user}` until the next reboot.')
 
-@client.command()
+@client.command(description="Make someone count in the auto-verification process again.")
 @commands.has_permissions(kick_members=True)
 async def unignore(ctx, user : discord.Member):
 	"""Unignore a user in the daily process"""
