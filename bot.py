@@ -168,7 +168,7 @@ async def on_message(message):
 	if message.channel.id == 326148489828368385 and not message.content.startswith('v!'): #ignore #random
 		return
 
-	if not message.author.id in cache.keys():
+	if not message.author.id in msgcount.keys():
 		msgcount[message.author.id] = 1
 	else:
 		msgcount[message.author.id] += 1
