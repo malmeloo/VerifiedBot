@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 client = Bot(command_prefix='v!')
 client.remove_command('help')
 
-cache = []
+msgcount = {}
 ignored = []
 
 updated = datetime.now().strftime('%x %X GMT+0')
@@ -30,14 +30,16 @@ async def assign_role(user_id):
 	"""assign role here"""
 	member = rc24.get_member(user_id)
 	await member.add_roles(verified_role, reason=f'[VERIFY] Added {verified_role} role to user.')
+	print(f"Removed role from {member}")
 
 async def remove_role(user_id):
 	"""remove role here"""
 	member = rc24.get_member(user_id)
 	await member.add_roles(verified_role, reason=f'[UNVERIFY] Removed {verified_role} role from user.')
+	print(f"Added role to {member}")
 
 #OWNER COMMAND(S)
-@client.command(description="Eval some code", name='eval')
+@client.command(hidden=True, name='eval')
 @commands.is_owner()
 async def _eval(ctx, *, body: str):
 	env = {
@@ -46,9 +48,7 @@ async def _eval(ctx, *, body: str):
 		'channel': ctx.channel,
 		'author': ctx.author,
 		'guild': ctx.guild,
-		'message': ctx.message,
-		'ignored': ignored,
-		'cache': cache
+		'message': ctx.message
 	}
 
 	env.update(globals())
@@ -86,30 +86,35 @@ async def _eval(ctx, *, body: str):
 async def help(ctx):
 	"""Guess what this is"""
 	em = discord.Embed(color=discord.Color.green(), title='Commands list')
-	for cmd in [x for x in client.commands if x.can_run(ctx)]:
-		em.add_field(name=cmd.signature, value=cmd.description)
+	for cmd in client.commands:
+		try:
+			if cmd.can_run(ctx):
+				em.add_field(name=cmd.signature, value=cmd.description)
+		except commands.CommandError:
+			pass
 	em.set_footer(text="Only commands you can use are shown.")
 
 	await ctx.send(embed=em)
 
-@client.command(description="Check the verification status of a user.")
+@client.command()
+@commands.has_permissions(kick_members=True)
 async def check(ctx, user : discord.Member):
-	"""Check the current addition/removal status"""
-	messages = [x for x in cache if x.author.id == user.id]
-	eligble = len(messages) >= minimum
+	"""Check the current addition/removal status (WIP)"""
+	eligble = msgcount[ctx.author.id] >= minimum
 
 	embed = discord.Embed(title='Status')
-	embed.add_field(name='Messages sent', value=len(messages))
+	embed.add_field(name='Messages sent', value=msgcount[ctx.author.id])
 	embed.add_field(name='Eligble for verification', value=eligble)
+	embed.add_field(inline=True, name='Currently verified', value=verified_role in ctx.author.roles)
 
 	if eligble:
 		embed.color = discord.Color.green()
 	else:
 		embed.color = discord.Color.red()
 
-	await ctx.send(f':white_check_mark: Stats of `{user}` since {updated}:', embed=embed)
+	await ctx.send(f':white_check_mark: Stats of `{user}`:', embed=embed)
 
-@client.command(description="Manually verify someone.")
+@client.command()
 @commands.has_permissions(kick_members=True)
 async def verify(ctx, user : discord.Member):
 	"""Temporarily verify a user"""
@@ -119,7 +124,7 @@ async def verify(ctx, user : discord.Member):
 	except Exception as err:
 		await ctx.send(f':x: An error has occured while trying to verify the user `{user}`:\n```{err}```')
 
-@client.command(description="Manually unverify someone.")
+@client.command()
 @commands.has_permissions(kick_members=True)
 async def unverify(ctx, user : discord.Member):
 	"""Temporarily unverify a user"""
@@ -129,14 +134,14 @@ async def unverify(ctx, user : discord.Member):
 	except Exception as err:
 		await ctx.send(f':x: An error has occured while trying to remove the role from `{user}`:\n```{err}```')
 
-@client.command(description="Leave someone out of the daily verification process.")
+@client.command()
 @commands.has_permissions(kick_members=True)
 async def ignore(ctx, user : discord.Member):
 	"""Ignore a user in the daily process (excludes manual checks)"""
 	ignored.append(user.id)
 	await ctx.send(f':white_check_mark: Now ignoring the user `{user}` until the next reboot.')
 
-@client.command(description="Make someone count in the auto-verification process again.")
+@client.command()
 @commands.has_permissions(kick_members=True)
 async def unignore(ctx, user : discord.Member):
 	"""Unignore a user in the daily process"""
@@ -163,7 +168,10 @@ async def on_message(message):
 	if message.channel.id == 326148489828368385 and not message.content.startswith('v!'): #ignore #random
 		return
 
-	cache.append(message)
+	if not message.author.id in cache.keys():
+		msgcount[message.author.id] = 1
+	else:
+		msgcount[message.author.id] += 1
 
 	await client.process_commands(message)
 
@@ -187,24 +195,24 @@ async def update():
 	await client.wait_until_ready()
 
 	while not client.is_closed:
+		print("Verification process started")
+		for i in rc24.members:
+			if i.id in msgcount.keys() and msgcount[i.id] >= minimum:
+				try:
+					await add_role(i.id)
+				except discord.Forbidden:
+					print(f"Failed to add role to {i}")
+			elif i.id in msgcount.keys() and not msgcount[i.id] >= minimum:
+				try:
+					await remove_role(i.id)
+				except discord.Forbidden:
+					print(f"Failed to remove role from {i}")
+		print("Verification process ended")
 
-		members = rc24.members
+		now = datetime.now()
+		delta = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59) - now
 
-		for member in members:
-			amount = len([msg for msg in cache if msg.author.id == member.id and not msg.author.id in ignored])
-			eligble = amount >= minimum
-
-			try:
-				if eligble and (not verified_role in member.roles):
-					await assign_role(member.id)
-				elif (not eligble) and (verified_role in member.roles):
-					await remove_role(member.id)
-			except discord.Forbidden:
-				pass
-		cache = [] #reset the cache
-		updated = datetime.now().strftime('%x %X GMT+0')
-
-		await asyncio.sleep(updaterate * 3600)
+		await asyncio.sleep(delta.seconds)
 
 client.loop.create_task(update())
 client.run(os.environ['BOT_TOKEN'])
