@@ -97,7 +97,6 @@ async def help(ctx):
 	await ctx.send(embed=em)
 
 @client.command()
-@commands.has_permissions(kick_members=True)
 async def check(ctx, user : discord.Member):
 	"""Check the current addition/removal status (WIP)"""
 	eligble = msgcount[ctx.author.id] >= minimum
