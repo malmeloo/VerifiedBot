@@ -198,7 +198,7 @@ async def update():
 		for i in rc24.members:
 			if i.id in msgcount.keys() and msgcount[i.id] >= minimum:
 				try:
-					await add_role(i.id)
+					await assign_role(i.id)
 				except discord.Forbidden:
 					print(f"Failed to add role to {i}")
 			elif i.id in msgcount.keys() and not msgcount[i.id] >= minimum:
