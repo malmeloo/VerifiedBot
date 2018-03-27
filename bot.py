@@ -97,8 +97,11 @@ async def help(ctx):
 	await ctx.send(embed=em)
 
 @client.command(description="Check a user's current verifiction status.")
-async def check(ctx, user : discord.Member):
-	"""Check the current addition/removal status (WIP)"""
+async def check(ctx, user : discord.Member = None):
+	"""Check the current addition/removal status"""
+	if not user:
+		user = ctx.author
+
 	eligble = msgcount[ctx.author.id] >= minimum
 
 	embed = discord.Embed(title='Status')
@@ -119,8 +122,11 @@ async def check(ctx, user : discord.Member):
 
 @client.command(description="Manually verify a user.")
 @commands.has_permissions(kick_members=True)
-async def verify(ctx, user : discord.Member):
+async def verify(ctx, user : discord.Member = None):
 	"""Temporarily verify a user"""
+	if not user:
+		user = ctx.author
+
 	try:
 		await assign_role(user.id)
 		await ctx.send(f':white_check_mark: Temporarily verified the user `{user}`!')
@@ -129,8 +135,11 @@ async def verify(ctx, user : discord.Member):
 
 @client.command(description="Manually unverify a user.")
 @commands.has_permissions(kick_members=True)
-async def unverify(ctx, user : discord.Member):
+async def unverify(ctx, user : discord.Member = None):
 	"""Temporarily unverify a user"""
+	if not user:
+		user = ctx.author
+
 	try:
 		await remove_role(user.id)
 		await ctx.send(f':white_check_mark: Temporarily unverified `{user}`!')
@@ -139,15 +148,21 @@ async def unverify(ctx, user : discord.Member):
 
 @client.command(description="Leave someone out of the daily verification process.")
 @commands.has_permissions(kick_members=True)
-async def ignore(ctx, user : discord.Member):
+async def ignore(ctx, user : discord.Member = None):
 	"""Ignore a user in the daily process (excludes manual checks)"""
+	if not user:
+		user = ctx.author
+
 	ignored.append(user.id)
 	await ctx.send(f':white_check_mark: Now ignoring the user `{user}` until the next reboot.')
 
 @client.command(description="Make the bot automatically check this user again.")
 @commands.has_permissions(kick_members=True)
-async def unignore(ctx, user : discord.Member):
+async def unignore(ctx, user : discord.Member = None):
 	"""Unignore a user in the daily process"""
+	if not user:
+		user = ctx.author
+
 	ignored.remove(user.id)
 	await ctx.send(f':white_check_mark: Stopped ignoring the user `{user}`.')
 
