@@ -113,7 +113,7 @@ async def check(ctx, user : discord.Member = None):
 	embed.add_field(name='Eligble for verification', value=eligble)
 	embed.add_field(inline=True, name='Currently verified', value=verified_role in ctx.author.roles)
 
-	embed.set_footer(text="Next daily check will happen at")
+	embed.set_footer(text="Next daily check at")
 	now = datetime.now()
 	embed.timestamp = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59)
 
