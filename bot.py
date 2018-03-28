@@ -29,14 +29,18 @@ minimum = 100			#min msgs a user has to send each day
 async def assign_role(user_id):
 	"""assign role here"""
 	member = rc24.get_member(user_id)
-	await member.add_roles(verified_role, reason=f'[VERIFY] Added {verified_role} role to user.')
-	print(f"Removed role from {member}")
+
+	if not verified_role in member.roles:
+		await member.add_roles(verified_role, reason=f'[VERIFY] Added {verified_role} role to user.')
+		paste(f"Added role to {member}")
 
 async def remove_role(user_id):
 	"""remove role here"""
 	member = rc24.get_member(user_id)
-	await member.add_roles(verified_role, reason=f'[UNVERIFY] Removed {verified_role} role from user.')
-	print(f"Added role to {member}")
+
+	if not verified_role in member.roles:
+		await member.remove_roles(verified_role, reason=f'[UNVERIFY] Removed {verified_role} role from user.')
+		print(f"Removed role from {member}")
 
 #OWNER COMMAND(S)
 @client.command(hidden=True, name='eval', description="Eval some code.")
