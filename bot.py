@@ -106,8 +106,13 @@ async def check(ctx, user : discord.Member = None):
 	if not user:
 		user = ctx.author
 
+	try:
+		amount = msgcount[user.id]
+	except KeyError:
+		amount = 0
+
 	embed = discord.Embed(title='Status')
-	embed.add_field(name='Messages sent', value=msgcount[user.id] if user.id in msgcount.keys() else 0)
+	embed.add_field(name='Messages sent', value=amount)
 	embed.add_field(name='Eligible for verification', value=msgcount[user.id] >= minimum)
 	embed.add_field(inline=True, name='Currently verified', value=verified_role in user.roles)
 
