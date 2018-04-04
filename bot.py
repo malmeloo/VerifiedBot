@@ -100,27 +100,22 @@ async def help(ctx):
 
 	await ctx.send(embed=em)
 
-@client.command(description="Check a user's current verifiction status.")
+@client.command(description="Check a user's current verification status.")
 async def check(ctx, user : discord.Member = None):
 	"""Check the current addition/removal status"""
 	if not user:
 		user = ctx.author
 
-	eligble = msgcount[ctx.author.id] >= minimum
-
 	embed = discord.Embed(title='Status')
-	embed.add_field(name='Messages sent', value=msgcount[ctx.author.id])
-	embed.add_field(name='Eligble for verification', value=eligble)
-	embed.add_field(inline=True, name='Currently verified', value=verified_role in ctx.author.roles)
+	embed.add_field(name='Messages sent', value=msgcount[user.id])
+	embed.add_field(name='Eligible for verification', value=msgcount[user.id] >= minimum)
+	embed.add_field(inline=True, name='Currently verified', value=verified_role in user.roles)
 
 	embed.set_footer(text="Next daily check:")
 	now = datetime.now()
 	embed.timestamp = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59)
 
-	if eligble:
-		embed.color = discord.Color.green()
-	else:
-		embed.color = discord.Color.red()
+	embed.color = discord.Color.green() if msgcount[user.id] >= minimum else discord.Color.red()
 
 	await ctx.send(f':white_check_mark: Stats of `{user}`:', embed=embed)
 
@@ -190,10 +185,7 @@ async def on_message(message):
 	if message.channel.id == 326148489828368385 and not message.content.startswith('v!'): #ignore #random
 		return
 
-	if not message.author.id in msgcount.keys():
-		msgcount[message.author.id] = 1
-	else:
-		msgcount[message.author.id] += 1
+	msgcount[message.author.id] += 1 if message.author.id in msgcount.keys() else msgcount[message.author.id] = 1
 
 	await client.process_commands(message)
 
