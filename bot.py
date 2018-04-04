@@ -106,9 +106,9 @@ async def check(ctx, user : discord.Member = None):
 	if not user:
 		user = ctx.author
 
-	try:
+	if user.id in msgcount.keys():
 		amount = msgcount[user.id]
-	except KeyError:
+	else:
 		amount = 0
 
 	embed = discord.Embed(title='Status')
