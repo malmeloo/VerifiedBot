@@ -215,8 +215,7 @@ async def on_ready():
 #TASKS
 async def update():
 	await client.wait_until_ready()
-	print("Test")
-	while not client.is_closed:
+	while not client.is_closed():
 		print("Verification process started")
 		for i in rc24.members:
 			if i.id in msgcount.keys() and msgcount[i.id] >= minimum:
