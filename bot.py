@@ -215,7 +215,7 @@ async def on_ready():
 #TASKS
 async def update():
 	await client.wait_until_ready()
-
+	print("Test")
 	while not client.is_closed:
 		print("Verification process started")
 		for i in rc24.members:
