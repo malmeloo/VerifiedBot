@@ -220,15 +220,9 @@ async def update():
 		print("Verification process started")
 		for i in rc24.members:
 			if i.id in msgcount.keys() and msgcount[i.id] >= minimum:
-				try:
-					await assign_role(i.id)
-				except discord.Forbidden:
-					print(f"Failed to add role to {i}")
-			elif i.id in msgcount.keys() and not msgcount[i.id] >= minimum:
-				try:
-					await remove_role(i.id)
-				except discord.Forbidden:
-					print(f"Failed to remove role from {i}")
+				await assign_role(i.id)
+			else:
+				await remove_role(i.id)
 		print("Verification process ended")
 
 		now = datetime.now()
