@@ -100,7 +100,7 @@ async def help(ctx):
 
 	await ctx.send(embed=em)
 
-@client.command(description="Check a user's current verification status.")
+@commands.group(description="Check a user's current verification status.", invoke_without_command=True)
 async def check(ctx, user : discord.Member = None):
 	"""Check the current addition/removal status"""
 	if not user:
@@ -120,9 +120,28 @@ async def check(ctx, user : discord.Member = None):
 	now = datetime.now()
 	embed.timestamp = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59)
 
+	embed.set_thumbnail(url=user.avatar_url)
 	embed.color = discord.Color.green() if msgcount[user.id] >= minimum else discord.Color.red()
 
 	await ctx.send(f':white_check_mark: Stats of `{user}`:', embed=embed)
+
+@check.command(description="Check all users for verification.")
+@commands.has_permissions(kick_members=True)
+async def all(ctx):
+	eligible_users = [str(ctx.guild.get_member(x)) for x in msgcount.keys() if msgcount[x] >= minimum]
+
+	embed = discord.Embed(title="Server status overview")
+	embed.add_field(name='Total registered users', value=len(msgcount.keys())
+	embed.add_field(name='Users eligible for verification', value='- ' + '\n - '.join(eligible_users) if eligible_users else "None")
+
+	embed.set_footer(text="Next daily check:")
+	now = datetime.now()
+	embed.timestamp = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59)
+
+	embed.color = discord.Color.green()
+	embed.set_thumbnail(url=ctx.guild.icon_url)
+
+	await ctx.send(":white_check_mark: Fetched global server verification stats!")
 
 @client.command(description="Manually verify a user.")
 @commands.has_permissions(kick_members=True)
@@ -179,6 +198,8 @@ async def on_command_error(ctx, error):
 		await ctx.send(':x: You do not have permission to use this command!')
 	elif isinstance(error, commands.MissingRequiredArgument):
 		await ctx.send(f':x: {error}')
+	elif isinstance(error, commands.CommandNotFound):
+		await ctx.message.add_reaction("\U00002753")
 	else:
 		traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
@@ -218,7 +239,7 @@ async def update():
 	await asyncio.sleep(10) #wait until it's _really_ ready
 	while not client.is_closed():
 		print("Verification process started")
-		for i in rc24.members:
+		for i in [x for x in rc24.members if not x.id in ignored]:
 			if i.id in msgcount.keys() and msgcount[i.id] >= minimum:
 				await assign_role(i.id)
 			else:
@@ -226,6 +247,7 @@ async def update():
 		print("Verification process ended")
 
 		now = datetime.now()
+		updated = now.strftime('%x %X GMT+0')
 		delta = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59) - now
 
 		await asyncio.sleep(delta.seconds)
