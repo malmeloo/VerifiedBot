@@ -141,7 +141,7 @@ async def all(ctx):
 	embed.color = discord.Color.green()
 	embed.set_thumbnail(url=ctx.guild.icon_url)
 
-	await ctx.send(":white_check_mark: Fetched global server verification stats!")
+	await ctx.send(":white_check_mark: Fetched global server verification stats!", embed=embed)
 
 @client.command(description="Manually verify a user.")
 @commands.has_permissions(kick_members=True)
