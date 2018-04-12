@@ -131,7 +131,7 @@ async def all(ctx):
 	eligible_users = [str(ctx.guild.get_member(x)) for x in msgcount.keys() if msgcount[x] >= minimum]
 
 	embed = discord.Embed(title="Server status overview")
-	embed.add_field(name='Total registered users', value=len(msgcount.keys())
+	embed.add_field(name='Total registered users', value=len(msgcount.keys()))
 	embed.add_field(name='Users eligible for verification', value='- ' + '\n - '.join(eligible_users) if eligible_users else "None")
 
 	embed.set_footer(text="Next daily check:")
