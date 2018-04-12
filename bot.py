@@ -100,7 +100,7 @@ async def help(ctx):
 
 	await ctx.send(embed=em)
 
-@commands.group(description="Check a user's current verification status.", invoke_without_command=True)
+@client.group(description="Check a user's current verification status.", invoke_without_command=True)
 async def check(ctx, user : discord.Member = None):
 	"""Check the current addition/removal status"""
 	if not user:
