@@ -22,7 +22,6 @@ ignored = []
 updated = datetime.now().strftime('%x %X GMT+0')
 
 #SETTINGS
-updaterate = 24			#update roles in h
 minimum = 100			#min msgs a user has to send each day
 
 #REGULAR FUNCTIONS
@@ -245,6 +244,7 @@ async def update():
 			else:
 				await remove_role(i.id)
 		print("Verification process ended")
+		msgcount = {} #reset stats for the day
 
 		now = datetime.now()
 		updated = now.strftime('%x %X GMT+0')
