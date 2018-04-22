@@ -235,8 +235,10 @@ async def on_ready():
 #TASKS
 async def update():
 	await client.wait_until_ready()
+	global msgcount
 	await asyncio.sleep(10) #wait until it's _really_ ready
 	while not client.is_closed():
+
 		print("Verification process started")
 		for i in [x for x in rc24.members if not x.id in ignored]:
 			if i.id in msgcount.keys() and msgcount[i.id] >= minimum:
@@ -245,7 +247,6 @@ async def update():
 				await remove_role(i.id)
 		print("Verification process ended")
 
-		global msgcount
 		msgcount = {} #reset stats for the day
 
 		now = datetime.now()
