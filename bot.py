@@ -244,6 +244,8 @@ async def update():
 			else:
 				await remove_role(i.id)
 		print("Verification process ended")
+
+		global msgcount
 		msgcount = {} #reset stats for the day
 
 		now = datetime.now()
