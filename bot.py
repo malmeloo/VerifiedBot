@@ -236,6 +236,7 @@ async def on_ready():
 async def update():
 	global msgcount
 	global updated
+	print("called func")
 
 	await client.wait_until_ready()
 	await asyncio.sleep(10) #wait until it's _really_ ready
