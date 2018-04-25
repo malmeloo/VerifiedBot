@@ -236,7 +236,6 @@ async def on_ready():
 async def update():
 	global msgcount
 	global updated
-	print("called func")
 
 	await client.wait_until_ready()
 	await asyncio.sleep(10) #wait until it's _really_ ready
@@ -254,9 +253,10 @@ async def update():
 
 		now = datetime.now()
 		updated = now.strftime('%x %X GMT+0')
-		delta = datetime(now.year, now.month, now.day, hour=0, minute=25, second=0) - now
+		delta = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59) - now
 
-		await asyncio.sleep(delta.seconds)
+		# adding 2s to prevent the loop from running again because the time is still at the 59th second
+		await asyncio.sleep(delta.seconds + 2)
 
 client.loop.create_task(update())
 client.run(os.environ['BOT_TOKEN'])
