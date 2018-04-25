@@ -254,7 +254,7 @@ async def update():
 
 		now = datetime.now()
 		updated = now.strftime('%x %X GMT+0')
-		delta = datetime(now.year, now.month, now.day, hour=0, minute=20, second=0) - now
+		delta = datetime(now.year, now.month, now.day, hour=0, minute=25, second=0) - now
 
 		await asyncio.sleep(delta.seconds)
 
