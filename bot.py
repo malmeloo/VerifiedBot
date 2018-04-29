@@ -225,7 +225,7 @@ async def on_ready():
 
 	rc24 = client.get_guild(206934458954153984)
 	verified_role = discord.utils.get(rc24.roles, name="Active")
-	owner = client.get_user(​311869975579066371)
+	owner = client.get_user(311869975579066371)
 
 	print(discord.__version__)
 	print('------------------')
