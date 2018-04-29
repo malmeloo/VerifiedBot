@@ -221,9 +221,11 @@ async def on_message(message):
 async def on_ready():
 	global rc24
 	global verified_role
+	global owner
 
 	rc24 = client.get_guild(206934458954153984)
 	verified_role = discord.utils.get(rc24.roles, name="Active")
+	owner = client.get_user(​311869975579066371)
 
 	print(discord.__version__)
 	print('------------------')
@@ -238,8 +240,12 @@ async def update():
 	global updated
 
 	await client.wait_until_ready()
-	await asyncio.sleep(10) #wait until it's _really_ ready
 	while not client.is_closed():
+		await asyncio.sleep(1800) #this hopefully prevents it from running twice
+		now = datetime.now()
+		updated = now.strftime('%x %X GMT+0')
+		delta = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59) - now
+		await asyncio.sleep(delta.seconds)
 
 		print("Verification process started")
 		for i in [x for x in rc24.members if not x.id in ignored]:
@@ -248,15 +254,9 @@ async def update():
 			else:
 				await remove_role(i.id)
 		print("Verification process ended")
-
 		msgcount = {} #reset stats for the day
 
-		now = datetime.now()
-		updated = now.strftime('%x %X GMT+0')
-		delta = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59) - now
-
-		# adding 2s to prevent the loop from running again because the time is still at the 59th second
-		await asyncio.sleep(delta.seconds + 2)
+		await owner.send(f"Daily process finished at _{updated}_ (waited for {delta.seconds}s)")
 
 client.loop.create_task(update())
 client.run(os.environ['BOT_TOKEN'])
