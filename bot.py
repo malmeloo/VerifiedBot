@@ -19,8 +19,6 @@ client.remove_command('help')
 msgcount = {}
 ignored = []
 
-updated = datetime.now().strftime('%x %X GMT+0')
-
 #SETTINGS
 minimum = 100			#min msgs a user has to send each day
 
@@ -241,7 +239,6 @@ async def update():
 
 	await client.wait_until_ready()
 	while not client.is_closed():
-		await asyncio.sleep(1800) #this hopefully prevents it from running twice
 		now = datetime.now()
 		updated = now.strftime('%x %X GMT+0')
 		delta = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59) - now
@@ -256,7 +253,9 @@ async def update():
 		print("Verification process ended")
 		msgcount = {} #reset stats for the day
 
+		now = datetime.now()
 		await owner.send(f"Daily process finished at _{updated}_ (waited for {delta.seconds}s)")
+		await asyncio.sleep(2)
 
 client.loop.create_task(update())
 client.run(os.environ['BOT_TOKEN'])
