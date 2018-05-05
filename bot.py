@@ -268,4 +268,4 @@ async def save():
 
 client.loop.create_task(update())
 client.loop.create_task(update())
-client.run(os.environ['BOT_TOKEN'])
+client.run(json.load(open('config.json'))['BOT_TOKEN'])
