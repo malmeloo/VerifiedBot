@@ -240,7 +240,6 @@ async def update():
 	await client.wait_until_ready()
 	while not client.is_closed():
 		now = datetime.now()
-		updated = now.strftime('%x %X GMT+0')
 		delta = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59) - now
 		await asyncio.sleep(delta.seconds)
 
@@ -254,6 +253,7 @@ async def update():
 		msgcount = {} #reset stats for the day
 
 		now = datetime.now()
+		updated = now.strftime('%x %X GMT+0')
 		await owner.send(f"Daily process finished at _{updated}_ (waited for {delta.seconds}s)")
 		await asyncio.sleep(2)
 
