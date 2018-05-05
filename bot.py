@@ -267,5 +267,5 @@ async def save():
 		await asyncio.sleep(10)
 
 client.loop.create_task(update())
-client.loop.create_task(update())
+client.loop.create_task(save())
 client.run(json.load(open('config.json'))['BOT_TOKEN'])
