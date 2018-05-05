@@ -5,6 +5,7 @@ import logging
 import traceback
 import os
 from contextlib import redirect_stdout
+import json
 import io
 import sys
 import textwrap
@@ -16,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 client = Bot(command_prefix='v!')
 client.remove_command('help')
 
-msgcount = {}
+msgcount = {int(k):v for k,v in json.load(open('msgcount.json')).items()}
 ignored = []
 
 #SETTINGS
@@ -259,5 +260,12 @@ async def update():
 		await owner.send(f"Daily process finished at _{updated}_ (waited for {delta.seconds}s)")
 		await asyncio.sleep(2)
 
+async def save():
+	await client.wait_until_ready()
+	while not client.is_closed():
+		json.dump(msgcount, open('msgcount.json', 'w+'))
+		await asyncio.sleep(10)
+
+client.loop.create_task(update())
 client.loop.create_task(update())
 client.run(os.environ['BOT_TOKEN'])
