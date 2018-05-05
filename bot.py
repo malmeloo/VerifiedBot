@@ -49,7 +49,9 @@ async def _eval(ctx, *, body: str):
 		'channel': ctx.channel,
 		'author': ctx.author,
 		'guild': ctx.guild,
-		'message': ctx.message
+		'message': ctx.message,
+		'msgcount': msgcount
+
 	}
 
 	env.update(globals())
