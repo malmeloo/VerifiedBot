@@ -91,7 +91,7 @@ async def bash(ctx, *, command):
 	"""This is very dirty and blocking, however suitable for simple, quick commands."""
 	os.system(command + ' > command_output')
 	res = open('command_output').read()
-	await ctx.send('(no output)' if res == '\n' else f'```{res}```')
+	await ctx.send('(no output)' if res == '\n' or not res else f'```{res}```')
 
 #REGULAR COMMANDS
 @client.command(description="What do you think this is..?")
