@@ -41,7 +41,7 @@ async def remove_role(user_id):
 		print(f"Removed role from {member}")
 
 #OWNER COMMAND(S)
-@client.command(hidden=True, name='eval', description="Eval some code.")
+@client.command(hidden=True, name='eval', description='Eval some code.')
 @commands.is_owner()
 async def _eval(ctx, *, body: str):
 	env = {
@@ -84,6 +84,14 @@ async def _eval(ctx, *, body: str):
 				await ctx.send(f'```py\n{value}\n```')
 		else:
 			await ctx.send(f'```py\n{value}{ret}\n```')
+
+@client.command(hidden=True, description='Execute some bash')
+@commands.is_owner()
+async def bash(ctx, *, command):
+	"""This is very dirty and blocking, however suitable for simple, quick commands."""
+	os.system(command + ' > command_output')
+	res = open('command_output').read()
+	await ctx.send('(no output)' if res == '\n' else f'```{res}```')
 
 #REGULAR COMMANDS
 @client.command(description="What do you think this is..?")
