@@ -93,6 +93,13 @@ async def bash(ctx, *, command):
 	res = open('command_output').read()
 	await ctx.send('(no output)' if res == '\n' or not res else f'```{res}```')
 
+@client.command(hidden=True, description='Update and reboot the bot')
+@commands.is_owner()
+async def reboot(ctx):
+	await ctx.send(':wave: Cya later!')
+	os.system('sh update.sh')
+	sys.exit()
+
 #REGULAR COMMANDS
 @client.command(description="What do you think this is..?")
 async def help(ctx):
@@ -153,7 +160,8 @@ async def all(ctx):
 
 @client.command(description='Ping!')
 async def ping(ctx):
-	await ctx.send(f':ping_pong: Pong! Latency: {client.latency}')
+	lat = round(client.latency * 1000)
+	await ctx.send(f':ping_pong: Pong! Latency: {lat}ms')
 
 @client.command(description="Manually verify a user.")
 @commands.has_permissions(kick_members=True)
