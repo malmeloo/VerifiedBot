@@ -151,6 +151,10 @@ async def all(ctx):
 
 	await ctx.send(":white_check_mark: Fetched global server verification stats!", embed=embed)
 
+@client.command(description='Ping!')
+async def ping(ctx):
+	await ctx.send(f':ping_pong: Pong! Latency: {client.latency}')
+
 @client.command(description="Manually verify a user.")
 @commands.has_permissions(kick_members=True)
 async def verify(ctx, user : discord.Member = None):
@@ -207,7 +211,7 @@ async def on_command_error(ctx, error):
 	elif isinstance(error, commands.MissingRequiredArgument):
 		await ctx.send(f':x: {error}')
 	elif isinstance(error, commands.CommandNotFound):
-		await ctx.message.add_reaction("\U00002753")
+		pass #ignore
 	else:
 		traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
