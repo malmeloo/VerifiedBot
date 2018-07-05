@@ -9,6 +9,7 @@ import io
 import sys
 import textwrap
 import asyncio
+import asyncio.subprocess as subp
 from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
@@ -87,17 +88,13 @@ async def _eval(ctx, *, body: str):
 @client.command(hidden=True, description='Execute some bash')
 @commands.is_owner()
 async def bash(ctx, *, command):
-	"""This is very dirty and blocking, however suitable for simple, quick commands."""
-	os.system(command + ' > command_output')
-	res = open('command_output').read()
-	await ctx.send('(no output)' if res == '\n' or not res else f'```{res}```')
-
-@client.command(hidden=True, description='Update and reboot the bot')
-@commands.is_owner()
-async def reboot(ctx):
-	await ctx.send(':wave: Cya later!')
-	os.system('sh update.sh')
-	sys.exit()
+	"""Executes terminal commands on the host"""
+	p = await subp.create_subprocess_shell(command, stdout=subp.PIPE, stderr=subp.STDOUT)
+	out, _ = await p.communicate()
+	out = out.decode().strip()
+	await ctx.message.add_reaction('\u2705')
+	if out:
+		await ctx.send(f'```\n{out}\n```')
 
 #REGULAR COMMANDS
 @client.command(description="What do you think this is..?")
