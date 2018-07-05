@@ -1,5 +1,4 @@
 import discord
-from discord.ext.commands import Bot
 from discord.ext import commands
 import logging
 import traceback
@@ -14,7 +13,7 @@ from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 
-client = Bot(command_prefix='v!')
+client = commands.Bot(command_prefix='v!')
 client.remove_command('help')
 
 msgcount = {int(k):v for k,v in json.load(open('msgcount.json')).items()}
@@ -283,7 +282,8 @@ async def update():
 async def save():
 	await client.wait_until_ready()
 	while not client.is_closed():
-		json.dump(msgcount, open('msgcount.json', 'w+'))
+		with open('msgcount.json', 'w+') as file:
+			json.dump(msgcount, file)
 		await asyncio.sleep(10)
 
 client.loop.create_task(update())
