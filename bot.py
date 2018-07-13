@@ -219,12 +219,12 @@ async def on_command_error(ctx, error):
 #EVENTS
 @client.event
 async def on_message(message):
-	if message.author.bot or message.channel.id == 326148489828368385 or not message.guild:
-		#ignore bots, #random and DMs
+	ctx = await client.get_context(message)
+	if message.author.bot or (message.channel.id == 326148489828368385 and not ctx.command) or not message.guild:
+		#ignore bots and DMs
 		return
 	
-	context = await client.get_context(message)
-	if not context.command:
+	if not ctx.command:
 		if message.author.id in msgcount.keys():
 			msgcount[message.author.id] += 1
 		else:
