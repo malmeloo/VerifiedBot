@@ -14,7 +14,7 @@ from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 
-client = commands.Bot(command_prefix='v!')
+client = commands.Bot(command_prefix=['v!', 'V!'])
 client.remove_command('help')
 
 msgcount = {int(k):v for k,v in json.load(open('msgcount.json')).items()}
@@ -117,10 +117,7 @@ async def check(ctx, user : discord.Member = None):
 	if not user:
 		user = ctx.author
 
-	if user.id in msgcount.keys():
-		amount = msgcount[user.id]
-	else:
-		amount = 0
+	amount = msgcount[user.id] if user.id in msgcount.keys() else 0
 
 	embed = discord.Embed(title='Status')
 	embed.add_field(name='Messages sent', value=amount)
@@ -222,15 +219,16 @@ async def on_command_error(ctx, error):
 #EVENTS
 @client.event
 async def on_message(message):
-	if message.author.bot:
+	if message.author.bot or message.channel.id == 326148489828368385 or not message.guild:
+		#ignore bots, #random and DMs
 		return
-	if message.channel.id == 326148489828368385 and not message.content.startswith('v!'): #ignore #random
-		return
-
-	if message.author.id in msgcount.keys():
-		msgcount[message.author.id] += 1
-	else:
-		msgcount[message.author.id] = 1
+	
+	context = await client.get_context(message)
+	if not context.command:
+		if message.author.id in msgcount.keys():
+			msgcount[message.author.id] += 1
+		else:
+			msgcount[message.author.id] = 1
 
 	await client.process_commands(message)
 
