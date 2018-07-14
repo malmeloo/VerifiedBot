@@ -121,7 +121,7 @@ async def check(ctx, user : discord.Member = None):
 
 	embed = discord.Embed(title='Status')
 	embed.add_field(name='Messages sent', value=amount)
-	embed.add_field(name='Eligible for verification', value=msgcount[user.id] >= minimum)
+	embed.add_field(name='Eligible for verification', value=amount >= minimum)
 	embed.add_field(inline=True, name='Currently verified', value=verified_role in user.roles)
 
 	embed.set_footer(text="Next daily check:")
@@ -129,7 +129,7 @@ async def check(ctx, user : discord.Member = None):
 	embed.timestamp = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59)
 
 	embed.set_thumbnail(url=user.avatar_url)
-	embed.color = discord.Color.green() if msgcount[user.id] >= minimum else discord.Color.red()
+	embed.color = discord.Color.green() if amount >= minimum else discord.Color.red()
 
 	await ctx.send(f':white_check_mark: Stats of `{user}`:', embed=embed)
 
