@@ -14,7 +14,7 @@ from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 
-client = commands.Bot(command_prefix=['v!', 'V!', 'varon!'])
+client = commands.Bot(command_prefix=['v!', 'V!'])
 client.remove_command('help')
 
 msgcount = {int(k):v for k,v in json.load(open('msgcount.json')).items()}
