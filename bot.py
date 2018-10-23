@@ -126,7 +126,6 @@ async def check(ctx, user : discord.Member = None):
 	embed.add_field(name='Messages sent', value=amount)
 	embed.add_field(name='Eligible for verification', value=verifiable)
 	embed.add_field(inline=True, name='Currently verified', value=verified)
-
 	embed.set_footer(text="Next daily check:")
 	now = datetime.now()
 	embed.timestamp = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59)
