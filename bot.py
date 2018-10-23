@@ -118,17 +118,9 @@ async def check(ctx, user : discord.Member = None):
 		user = ctx.author
 
 	amount = msgcount[user.id] if user.id in msgcount.keys() else 0
-	verifiable = ""			      
-	if amount >= minimum:
-		verifiable = "Yes"
-	else:
-		verifiable = "No"		      
-	
-	verified = ""
-	if verified_role in user.roles
-		verified = "Yes"
-	else
-		verified = "No"
+  
+	verifiable = "Yes" if amount >= minimum else verifiable = "No"
+	verified = "Yes" if verified_role in user.roles else verified = "No"
 				     
 	embed = discord.Embed(title='Status')
 	embed.add_field(name='Messages sent', value=amount)
