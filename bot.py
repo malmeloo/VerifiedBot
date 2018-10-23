@@ -121,8 +121,8 @@ async def check(ctx, user : discord.Member = None):
 
 	embed = discord.Embed(title='Status')
 	embed.add_field(name='Messages sent', value=amount)
-	embed.add_field(name='Eligible for verification', value=amount >= minimum)
-	embed.add_field(inline=True, name='Currently verified', value=verified_role in user.roles)
+	embed.add_field(name='Eligible for verification', value="Yes" if amount >= minimum else "No")
+	embed.add_field(inline=True, name='Currently verified', value="Yes" if verified_role in user.roles else "No")
 
 	embed.set_footer(text="Next daily check:")
 	now = datetime.now()
