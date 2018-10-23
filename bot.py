@@ -118,11 +118,22 @@ async def check(ctx, user : discord.Member = None):
 		user = ctx.author
 
 	amount = msgcount[user.id] if user.id in msgcount.keys() else 0
-
+	verifiable = ""			      
+	if amount >= minimum:
+		verifiable = "Yes"
+	else:
+		verifiable = "No"		      
+	
+	verified = ""
+	if verified_role in user.roles
+		verified = "Yes"
+	else
+		verified = "No"
+				     
 	embed = discord.Embed(title='Status')
 	embed.add_field(name='Messages sent', value=amount)
-	embed.add_field(name='Eligible for verification', value=amount >= minimum)
-	embed.add_field(inline=True, name='Currently verified', value=verified_role in user.roles)
+	embed.add_field(name='Eligible for verification', value=verifiable)
+	embed.add_field(inline=True, name='Currently verified', value=verified)
 
 	embed.set_footer(text="Next daily check:")
 	now = datetime.now()
@@ -154,7 +165,7 @@ async def all(ctx):
 @client.command(description='Ping!')
 async def ping(ctx):
 	lat = round(client.latency * 1000)
-	await ctx.send(f':ping_pong: Pong! Latency: {lat}ms')
+	await ctx.send(f':ping_pong: Pong! Latency: **{lat}**ms')
 
 @client.command(description="Manually verify a user.")
 @commands.has_permissions(kick_members=True)
@@ -237,7 +248,7 @@ async def on_ready():
 	global rc24
 	global verified_role
 	global owner
-
+				      		      
 	rc24 = client.get_guild(206934458954153984)
 	verified_role = discord.utils.get(rc24.roles, name="Active")
 	owner = client.get_user(311869975579066371)
