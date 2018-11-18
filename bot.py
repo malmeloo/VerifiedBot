@@ -258,7 +258,7 @@ async def update():
 
 	await client.wait_until_ready()
 	while not client.is_closed():
-		now = datetime.now()
+		now = datetime.utcnow()
 		delta = datetime(now.year, now.month, now.day, hour=23, minute=59, second=59) - now
 		await asyncio.sleep(delta.seconds)
 
